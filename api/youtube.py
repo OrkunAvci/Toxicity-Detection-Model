@@ -9,33 +9,31 @@ class Youtube:
 	__api_key = None
 	__client = None
 	__detector = None
-	__session_id = None
 
-	def __init__(self, session_id: str) -> None:
+	def __init__(self) -> None:
 		with open("config.json", "r") as f:
 			config = json.loads(f.read())
 			self.__api_key = config["YOUTUBE_API_KEY"]
 		self.__client = discovery.build("youtube", "v3", developerKey=self.__api_key)
 		self.__detector = Detector()
-		self.__session_id = session_id
 
-	def get_comments_batch(self):
+	def get_comments_batch(self, id):
 		response = (
 			self.__client.commentThreads()
 			.list(
 				part= "snippet",
-				videoId= self.__session_id,
+				videoId= id,
 				maxResults= 60
 			)
 			.execute()
 		)
 		return response["items"]
 
-	def get_comments(self)-> list:
+	def get_comments(self, id)-> list:
 		all_comments = []
 		request = self.__client.commentThreads().list(
 			part= "snippet", 
-			videoId= self.__session_id,
+			videoId= id,
 			maxResults= 60
 		)
 		response = request.execute()
@@ -52,7 +50,7 @@ class Youtube:
 					self.__client.commentThreads()
 					.list(
 						part= "snippet",
-						videoId= self.__session_id,
+						videoId= id,
 						pageToken= response["nextPageToken"]
 					)
 					.execute()
@@ -61,7 +59,7 @@ class Youtube:
 				break
 		
 		print("Total number of comments returned: ", len(all_comments))
-		return all_comments
+		return [comment["snippet"]["textOriginal"] for comment in all_comments]
 	
 	def get_replies(self, parent_id: str)-> list:
 		replies = []
