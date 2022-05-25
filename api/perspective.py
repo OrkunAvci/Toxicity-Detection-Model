@@ -2,8 +2,6 @@ from asyncio import to_thread
 from time import sleep
 from googleapiclient import discovery, errors
 import json
-import pprint
-
 
 class Detector:
 	__api_key = None
@@ -36,13 +34,14 @@ class Detector:
 				sleep(70)
 				return self.detect(text = text)
 			else:
-				pass
-				# print(e.error_details[0]["errorType"])
+				print(e)
+				print(e.error_details[0]["errorType"])
 
 	def make_request_body(self, text: str)-> dict:
 		return {
 				"comment": {"text": text},
-				"requestedAttributes": self.__req_attr
+				"requestedAttributes": self.__req_attr,
+				"languages": ["en"],
 			}
 
 	def handle_response(self, text: str, response: dict):
