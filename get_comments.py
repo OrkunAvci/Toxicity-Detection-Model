@@ -1,8 +1,10 @@
 from api.youtube import Youtube
 import json
+import threading
 
 video_ids = []
 comments = {}
+lock = threading.Lock()
 
 with open("./data/video_ids.json", "r") as f:
 	video_ids = json.loads(f.read())
@@ -16,6 +18,7 @@ for id in video_ids:
 		print("Session ID: ", id)
 		comments[id] = yt.get_comments(id)
 		with open("./data/comments.json", "r+") as f:
-			f.write(json.dumps(comments))
+			with lock:
+				f.write(json.dumps(comments))
 	else:
 		print("Skipped ", id)
