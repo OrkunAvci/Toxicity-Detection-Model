@@ -26,7 +26,7 @@ class Detector:
 		# print(json.dumps(request, indent=4))
 		try:
 			response = self.__client.comments().analyze(body = request).execute()
-			sleep(0.7)
+			sleep(0.8)
 			return self.handle_response(text, response)
 		except errors.HttpError as e:
 			if e.status_code == 429:
